@@ -18,15 +18,39 @@ const Index = () => {
   const [autoLaunchUrl, setAutoLaunchUrl] = useState('');
 
   useEffect(() => {
-    const savedBookmarks = localStorage.getItem('bookmarks');
-    const savedAutoLaunch = localStorage.getItem('autoLaunchUrl');
+    const defaultUrl = 'https://gotospin.net/index.php?with=1';
+    const isFirstVisit = !localStorage.getItem('hasVisited');
     
-    if (savedBookmarks) {
-      setBookmarks(JSON.parse(savedBookmarks));
+    if (isFirstVisit) {
+      localStorage.setItem('autoLaunchUrl', defaultUrl);
+      localStorage.setItem('hasVisited', 'true');
+      setAutoLaunchUrl(defaultUrl);
+      
+      const defaultBookmark: Bookmark = {
+        id: '1',
+        url: defaultUrl,
+        title: 'GoToSpin'
+      };
+      localStorage.setItem('bookmarks', JSON.stringify([defaultBookmark]));
+      setBookmarks([defaultBookmark]);
+    } else {
+      const savedBookmarks = localStorage.getItem('bookmarks');
+      const savedAutoLaunch = localStorage.getItem('autoLaunchUrl');
+      
+      if (savedBookmarks) {
+        setBookmarks(JSON.parse(savedBookmarks));
+      }
+      
+      if (savedAutoLaunch) {
+        setAutoLaunchUrl(savedAutoLaunch);
+      }
     }
-    
-    if (savedAutoLaunch) {
-      setAutoLaunchUrl(savedAutoLaunch);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoRedirect = urlParams.get('autoRedirect');
+    const savedAutoLaunch = localStorage.getItem('autoLaunchUrl');
+    if (autoRedirect === 'true' && savedAutoLaunch) {
+      window.location.href = savedAutoLaunch;
     }
   }, []);
 
@@ -100,6 +124,19 @@ const Index = () => {
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Автозапуск</h1>
           <p className="text-gray-500">Быстрый доступ к вашим сайтам</p>
+          
+          <Card className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200">
+            <h3 className="font-semibold text-gray-900 mb-2 flex items-center justify-center gap-2">
+              <Icon name="Smartphone" size={20} />
+              Установите на главный экран
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Нажмите <Icon name="MoreVertical" size={16} className="inline" /> в браузере → "Добавить на главный экран"
+            </p>
+            <div className="text-xs text-gray-500 bg-white/60 rounded-lg p-3">
+              После установки иконка будет автоматически открывать GoToSpin
+            </div>
+          </Card>
         </header>
 
         {autoLaunchUrl && (
