@@ -1,0 +1,65 @@
+{
+  "tests": [
+    {
+      "name": "Получение информации о сервисе",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "service": "Data Transfer API",
+        "version": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Успешная выгрузка данных",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "source_base": "base1",
+        "target_base": "base2",
+        "records": [
+          {
+            "id": "123",
+            "type": "nomenclature",
+            "data": {
+              "name": "Товар 1",
+              "price": 100
+            }
+          }
+        ]
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "transferred_count": 1,
+        "failed_count": 0,
+        "transfer_id": "string",
+        "timestamp": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Обработка записи с ошибкой",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "source_base": "base1",
+        "target_base": "base2",
+        "records": [
+          {
+            "id": "",
+            "type": "nomenclature",
+            "data": {}
+          }
+        ]
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": false,
+        "failed_count": 1
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
